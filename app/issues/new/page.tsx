@@ -17,27 +17,24 @@ import Spinner from "@/components/Spinner";
 type IssueForm = z.infer<typeof createIssueSchema>;
 const NewIssuePage = () => {
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const router = useRouter();
   const {
     register,
     control,
     watch,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IssueForm>({
     resolver: zodResolver(createIssueSchema),
   });
 
   const onSubmit: SubmitHandler<IssueForm> = async (data) => {
     try {
-      setIsSubmitting(true);
       await axios.post("/api/issues", data);
       router.push("/issues");
     } catch (error) {
       setError("Unexpected error");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

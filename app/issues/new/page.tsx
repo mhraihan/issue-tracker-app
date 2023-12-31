@@ -1,19 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import { Button, Callout, TextField, Text } from "@radix-ui/themes";
+import { createIssueSchema } from "@/app/validationSchemas";
+import ErrorMessage from "@/components/ErrorMessage";
+import Spinner from "@/components/Spinner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Callout, TextField } from "@radix-ui/themes";
+import axios from "axios";
+import "easymde/dist/easymde.min.css";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
-import "easymde/dist/easymde.min.css";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { createIssueSchema } from "@/app/validationSchemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import ErrorMessage from "@/components/ErrorMessage";
-import Spinner from "@/components/Spinner";
 type IssueForm = z.infer<typeof createIssueSchema>;
 const NewIssuePage = () => {
   const [error, setError] = useState("");
@@ -22,7 +22,6 @@ const NewIssuePage = () => {
   const {
     register,
     control,
-    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<IssueForm>({

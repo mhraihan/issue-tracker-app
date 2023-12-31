@@ -1,7 +1,7 @@
 import React from "react";
 import prisma from "@/prisma/prisma";
 import { notFound } from "next/navigation";
-import { Flex, Heading, Text } from "@radix-ui/themes";
+import { Card, Flex, Heading, Text } from "@radix-ui/themes";
 import IssueStatusBadge from "@/components/IssueStatusBadge";
 interface Props {
   params: {
@@ -16,13 +16,13 @@ const IssueDetailsPage = async ({ params: { id } }: Props) => {
     notFound();
   }
   return (
-    <div>
+    <div className="max-w-xl">
       <Heading>{issue.title}</Heading>
       <Flex my={"4"} className="space-x-3">
         <IssueStatusBadge status={issue.status} />
         <Text>{issue.createdAt.toDateString()}</Text>
       </Flex>
-      <Text>{issue.description}</Text>
+      <Card>{issue.description}</Card>
     </div>
   );
 };

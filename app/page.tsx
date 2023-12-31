@@ -1,12 +1,9 @@
-import Link from "next/link";
-import { Button } from "@radix-ui/themes";
+import IssueActions from "@/components/IssueActions";
 
 export default function Home() {
   return (
     <div>
-      <Button>
-        <Link href="/issues/new">Create New Issue</Link>
-      </Button>
+      <IssueActions />
     </div>
   );
 }

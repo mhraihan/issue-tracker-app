@@ -54,5 +54,5 @@ const issuePage = async () => {
     </div>
   );
 };
-
+export const dynamic = "force-dynamic";
 export default issuePage;

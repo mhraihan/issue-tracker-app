@@ -1,3 +1,5 @@
 {
-  "cSpell.words": ["hookform", "simplemde", "tailwindcss"]
+  "cSpell.words": ["hookform", "simplemde", "tailwindcss"],
+  "window.zoomLevel": 2.75,
+  "editor.fontSize": 20
 }

@@ -28,3 +28,22 @@ export async function PATCH(
   });
   return NextResponse.json(updateIssue, { status: 200 });
 }
+export async function DELETE(
+  request: NextRequest,
+  { params: { id } }: { params: { id: string } }
+) {
+  const issue = await prisma.issue.findUnique({
+    where: {
+      id: +id,
+    },
+  });
+  if (!issue) {
+    return NextResponse.json({ error: `No such issue found ${id}` });
+  }
+  await prisma.issue.delete({
+    where: {
+      id: issue.id,
+    },
+  });
+  return NextResponse.json({}, { status: 200 });
+}

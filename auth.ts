@@ -6,24 +6,34 @@ import Github from "next-auth/providers/github";
 export const authConfig = {
   adapter: PrismaAdapter(prisma),
   providers: [Github],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    async session({ session, user }) {
-      session.user.id = user.id;
+    async session({ session, token }) {
+      if (token?.sub) {
+        session.user.id = token?.sub;
+      }
+
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {
-      console.log(auth?.user);
       
-      // const isLoggedIn = !!auth?.user;
-      // const paths = ["/issues"];
-      // const isProtected = paths.some((path) =>
-      //   nextUrl.pathname.startsWith(path)
-      // );
-      // if (isProtected && !isLoggedIn) {
-      //   const redirectUrl = new URL("/api/auth/signin", nextUrl.origin);
-      //   redirectUrl.searchParams.append("callbackUrl", nextUrl.href);
-      //   return Response.redirect(redirectUrl);
-      // }
+      const isLoggedIn = !!auth?.user;
+      const protectedPaths = ["/issues/new", /^\/issues\/\d+\/edit/];
+
+      const isProtected = protectedPaths.some((path) =>
+        typeof path === "string"
+          ? nextUrl.pathname.startsWith(path)
+          : path.test(nextUrl.pathname)
+      );
+
+      if (isProtected && !isLoggedIn) {
+        const redirectUrl = new URL("/api/auth/signin", nextUrl.origin);
+        redirectUrl.searchParams.append("callbackUrl", nextUrl.href);
+        return Response.redirect(redirectUrl);
+      }
+
       return true;
     },
   },

@@ -1,8 +1,15 @@
 import { issueSchema } from "@/app/validationSchemas";
+import { auth } from "@/auth";
 import prisma from "@/prisma/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export const POST = auth(async (request) => {
+  if (!request?.auth) {
+    return NextResponse.json(
+      { message: "Unauthorize Access" },
+      { status: 401 }
+    );
+  }
   const body = await request.json();
   const validation = issueSchema.safeParse(body);
   if (!validation.success) {
@@ -16,4 +23,4 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json(newIssue, { status: 201 });
-}
+});

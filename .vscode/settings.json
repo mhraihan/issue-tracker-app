@@ -5,7 +5,8 @@
     "hookform",
     "signin",
     "simplemde",
-    "tailwindcss"
+    "tailwindcss",
+    "tanstack"
   ],
   "window.zoomLevel": 2.75,
   "editor.fontSize": 20,

@@ -1,4 +1,4 @@
-import { issueSchema } from "@/app/validationSchemas";
+import { patchIssueSchema } from "@/app/validationSchemas";
 import prisma from "@/prisma/prisma";
 import { checkAuthorization, handleUnauthorized } from "@/utils/authUtils";
 import { findIssueById, handleIssueNotFound } from "@/utils/prismaUtils";
@@ -14,9 +14,21 @@ export async function PATCH(
     return handleUnauthorized();
   }
   const body = await request.json();
-  const validate = issueSchema.safeParse(body);
+  const validate = patchIssueSchema.safeParse(body);
   if (!validate.success) {
     return NextResponse.json(validate.error.format(), { status: 500 });
+  }
+  const { assignedToUserId, title, description } = body;
+  if (assignedToUserId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: assignedToUserId,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "Invalid user" }, { status: 400 });
+    }
   }
   const issue = await findIssueById(id);
   if (!issue) {
@@ -26,8 +38,9 @@ export async function PATCH(
   const updateIssue = await prisma.issue.update({
     where: { id: issue.id },
     data: {
-      title: body.title,
-      description: body.description,
+      title,
+      description,
+      assignedToUserId,
     },
   });
   return NextResponse.json(updateIssue, { status: 200 });

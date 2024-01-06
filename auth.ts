@@ -3,9 +3,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import Github from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 export const authConfig = {
   adapter: PrismaAdapter(prisma),
-  providers: [Github],
+  providers: [Github, Google],
   session: {
     strategy: "jwt",
   },

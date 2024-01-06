@@ -25,8 +25,12 @@ const NavBarAccount = ({ session, signIn, signOut }: Props) => {
       <DropdownMenu.Trigger>
         <Button variant="ghost" className="!outline-none">
           <Avatar
+            radius="full"
+            size={"2"}
+            className="cursor-pointer"
             src={session!.user.image!}
             fallback={session!.user.name!.slice(0, 2)}
+            referrerPolicy="no-referrer"
           />
           <CaretDownIcon />
         </Button>

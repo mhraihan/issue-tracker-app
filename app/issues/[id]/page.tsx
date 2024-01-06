@@ -1,39 +1,44 @@
-import prisma from "@/prisma/prisma";
+import { checkAuthorization } from "@/utils/authUtils";
+import { findIssueById } from "@/utils/prismaUtils";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
+import DeleteIssueButton from "./DeleteIssueButton";
 import EditIssueButton from "./EditIssueButton";
 import IssueDetails from "./IssueDetails";
-import DeleteIssueButton from "./DeleteIssueButton";
-import { auth } from "@/auth";
 interface Props {
   params: {
     id: string;
   };
 }
 const IssueDetailsPage = async ({ params: { id } }: Props) => {
-  const session = await auth();
-  const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(id) },
-  });
+  try {
+    const [session, issue] = await Promise.all([
+      checkAuthorization(),
+      findIssueById(id),
+    ]);
 
-  if (!issue) {
+
+    if (!issue) {
+      notFound();
+    }
+    return (
+      <Grid columns={{ initial: "1", sm: "5" }} gap={"5"}>
+        <Box className="md:col-span-4">
+          <IssueDetails issue={issue} />
+        </Box>
+        {session && (
+          <Box>
+            <Flex direction={"column"} gap={"3"}>
+              <EditIssueButton issueId={id} />
+              <DeleteIssueButton issueId={id} />
+            </Flex>
+          </Box>
+        )}
+      </Grid>
+    );
+  } catch (error) {
     notFound();
   }
-  return (
-    <Grid columns={{ initial: "1", sm: "5" }} gap={"5"}>
-      <Box className="md:col-span-4">
-        <IssueDetails issue={issue} />
-      </Box>
-      {session && (
-        <Box>
-          <Flex direction={"column"} gap={"3"}>
-            <EditIssueButton issueId={id} />
-            <DeleteIssueButton issueId={id} />
-          </Flex>
-        </Box>
-      )}
-    </Grid>
-  );
 };
 
 export default IssueDetailsPage;

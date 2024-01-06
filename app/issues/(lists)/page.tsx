@@ -1,23 +1,28 @@
 import { IssueStatusBadge, Link } from "@/components";
 import IssueActions from "@/components/IssueActions";
 import prisma from "@/prisma/prisma";
+import { checkAuthorization } from "@/utils/authUtils";
 import { Table } from "@radix-ui/themes";
 const issuePage = async () => {
-  const issues = await prisma.issue.findMany({
-    select: {
-      id: true,
-      title: true,
-      status: true,
-      createdAt: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const [authorize,issues] = await Promise.all([
+    checkAuthorization(),
+    prisma.issue.findMany({
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    })
+  ])
+ 
 
   return (
     <div>
-      <IssueActions />
+      {authorize && <IssueActions />}
       <Table.Root>
         <Table.Header>
           <Table.Row>

@@ -1,33 +1,26 @@
 import { issueSchema } from "@/app/validationSchemas";
-import { auth } from "@/auth";
 import prisma from "@/prisma/prisma";
+import { checkAuthorization, handleUnauthorized } from "@/utils/authUtils";
+import { findIssueById, handleIssueNotFound } from "@/utils/prismaUtils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
   { params: { id } }: { params: { id: string } }
 ) {
-  const session = await auth();
-  const isLoggedIn = !!session?.user;
+  const isLoggedIn = await checkAuthorization();
 
   if (!isLoggedIn) {
-    return NextResponse.json(
-      { message: "Unauthorize Access" },
-      { status: 401 }
-    );
+    return handleUnauthorized();
   }
   const body = await request.json();
   const validate = issueSchema.safeParse(body);
   if (!validate.success) {
     return NextResponse.json(validate.error.format(), { status: 500 });
   }
-  const issue = await prisma.issue.findUnique({
-    where: {
-      id: +id,
-    },
-  });
+  const issue = await findIssueById(id);
   if (!issue) {
-    return NextResponse.json({ error: `No such issue found ${id}` });
+    return handleIssueNotFound(id);
   }
 
   const updateIssue = await prisma.issue.update({
@@ -43,23 +36,14 @@ export async function DELETE(
   request: NextRequest,
   { params: { id } }: { params: { id: string } }
 ) {
-  const session = await auth();
-  const isLoggedIn = !!session?.user;
+  const isLoggedIn = await checkAuthorization();
 
   if (!isLoggedIn) {
-    return NextResponse.json(
-      { message: "Unauthorize Access" },
-      { status: 401 }
-    );
+    return handleUnauthorized();
   }
-
-  const issue = await prisma.issue.findUnique({
-    where: {
-      id: +id,
-    },
-  });
+  const issue = await findIssueById(id);
   if (!issue) {
-    return NextResponse.json({ error: `No such issue found ${id}` });
+    return handleIssueNotFound(id);
   }
   await prisma.issue.delete({
     where: {

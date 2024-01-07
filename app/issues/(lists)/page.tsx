@@ -2,14 +2,20 @@ import { IssueStatusBadge, Link } from "@/components";
 import IssueActions from "@/components/IssueActions";
 import prisma from "@/prisma/prisma";
 import { checkAuthorization } from "@/utils/authUtils";
-import { Status } from "@prisma/client";
+import { Issue, Status } from "@prisma/client";
 import { Table } from "@radix-ui/themes";
+import NextLink from "next/link";
 interface Props {
   searchParams: {
     status: Status;
   };
 }
 const issuePage = async ({ searchParams }: Props) => {
+  const columns: { label: string; value: keyof Issue; className?: string }[] = [
+    { label: "Issue", value: "title" },
+    { label: "Status", value: "status", className: "hidden md:table-cell" },
+    { label: "Created", value: "createdAt", className: "hidden md:table-cell" },
+  ];
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
@@ -26,9 +32,9 @@ const issuePage = async ({ searchParams }: Props) => {
       orderBy: {
         createdAt: "desc",
       },
-      where:{
-        status
-      }
+      where: {
+        status,
+      },
     }),
   ]);
 
@@ -38,13 +44,15 @@ const issuePage = async ({ searchParams }: Props) => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Status
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Created
-            </Table.ColumnHeaderCell>
+            {columns.map((col) => (
+              <Table.ColumnHeaderCell key={col.value} className={col.className}>
+                <NextLink
+                  href={{ query: { ...searchParams, orderBy: col.label } }}
+                >
+                  {col.label}
+                </NextLink>
+              </Table.ColumnHeaderCell>
+            ))}
           </Table.Row>
         </Table.Header>
 

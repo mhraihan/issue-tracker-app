@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "./theme-config.css";
-
+import {Toaster} from "react-hot-toast"
 import QueryClientProvider from "@/providers/QueryClientProvider";
 import NavBar from "./NavBar";
 
@@ -31,6 +31,7 @@ export default function RootLayout({
             </main>
           </Theme>
         </QueryClientProvider>
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

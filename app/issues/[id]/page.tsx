@@ -42,5 +42,4 @@ const IssueDetailsPage = async ({ params: { id } }: Props) => {
     notFound();
   }
 };
-
 export default IssueDetailsPage;

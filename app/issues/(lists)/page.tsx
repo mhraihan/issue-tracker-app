@@ -2,9 +2,19 @@ import { IssueStatusBadge, Link } from "@/components";
 import IssueActions from "@/components/IssueActions";
 import prisma from "@/prisma/prisma";
 import { checkAuthorization } from "@/utils/authUtils";
+import { Status } from "@prisma/client";
 import { Table } from "@radix-ui/themes";
-const issuePage = async () => {
-  const [authorize,issues] = await Promise.all([
+interface Props {
+  searchParams: {
+    status: Status;
+  };
+}
+const issuePage = async ({ searchParams }: Props) => {
+  const statuses = Object.values(Status);
+  const status = statuses.includes(searchParams.status)
+    ? searchParams.status
+    : undefined;
+  const [authorize, issues] = await Promise.all([
     checkAuthorization(),
     prisma.issue.findMany({
       select: {
@@ -16,9 +26,11 @@ const issuePage = async () => {
       orderBy: {
         createdAt: "desc",
       },
-    })
-  ])
- 
+      where:{
+        status
+      }
+    }),
+  ]);
 
   return (
     <div>

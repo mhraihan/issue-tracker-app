@@ -8,6 +8,7 @@ import NextLink from "next/link";
 interface Props {
   searchParams: {
     status: Status;
+    orderBy: keyof Issue;
   };
 }
 const issuePage = async ({ searchParams }: Props) => {
@@ -17,6 +18,9 @@ const issuePage = async ({ searchParams }: Props) => {
     { label: "Created", value: "createdAt", className: "hidden md:table-cell" },
   ];
   const statuses = Object.values(Status);
+  const orderBy = columns.map((col) => col.value).includes(searchParams.orderBy)
+    ? { [searchParams.orderBy]: "desc" }
+    : undefined;
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
@@ -29,9 +33,7 @@ const issuePage = async ({ searchParams }: Props) => {
         status: true,
         createdAt: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
       where: {
         status,
       },
@@ -47,7 +49,7 @@ const issuePage = async ({ searchParams }: Props) => {
             {columns.map((col) => (
               <Table.ColumnHeaderCell key={col.value} className={col.className}>
                 <NextLink
-                  href={{ query: { ...searchParams, orderBy: col.label } }}
+                  href={{ query: { ...searchParams, orderBy: col.value } }}
                 >
                   {col.label}
                 </NextLink>

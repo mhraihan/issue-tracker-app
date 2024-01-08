@@ -1,5 +1,6 @@
 import { IssueStatusBadge, Link } from "@/components";
 import IssueActions from "@/components/IssueActions";
+import Pagination from "@/components/Pagination";
 import prisma from "@/prisma/prisma";
 import { checkAuthorization } from "@/utils/authUtils";
 import { Issue, Status } from "@prisma/client";
@@ -10,6 +11,7 @@ interface Props {
   searchParams: {
     status: Status;
     orderBy: keyof Issue;
+    page: string;
   };
 }
 const issuePage = async ({ searchParams }: Props) => {
@@ -25,7 +27,10 @@ const issuePage = async ({ searchParams }: Props) => {
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
-  const [authorize, issues] = await Promise.all([
+  const where = { status };
+  const page = parseInt(searchParams.page ?? 1, 10);
+  const pageSize = 10;
+  const [authorize, issues, issueCount] = await Promise.all([
     checkAuthorization(),
     prisma.issue.findMany({
       select: {
@@ -35,10 +40,11 @@ const issuePage = async ({ searchParams }: Props) => {
         createdAt: true,
       },
       orderBy,
-      where: {
-        status,
-      },
+      where,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     }),
+    prisma.issue.count({ where }),
   ]);
 
   return (
@@ -54,7 +60,9 @@ const issuePage = async ({ searchParams }: Props) => {
                 >
                   {col.label}
                 </NextLink>
-                {col.value === searchParams.orderBy && <ArrowUpIcon className="inline" />}
+                {col.value === searchParams.orderBy && (
+                  <ArrowUpIcon className="inline" />
+                )}
               </Table.ColumnHeaderCell>
             ))}
           </Table.Row>
@@ -79,6 +87,11 @@ const issuePage = async ({ searchParams }: Props) => {
           ))}
         </Table.Body>
       </Table.Root>
+      <Pagination
+        currentPage={page}
+        itemCount={issueCount}
+        pageSize={pageSize}
+      />
     </div>
   );
 };

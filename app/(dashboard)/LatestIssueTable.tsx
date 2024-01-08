@@ -20,8 +20,7 @@ const LatestIssueTable = async () => {
       createdAt: "desc"
     },
   });
-  console.log(issues[0]);
-
+  
   return (
     <Card>
       <Heading size="4" mb="5">

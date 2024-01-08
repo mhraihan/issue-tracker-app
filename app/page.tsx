@@ -1,11 +1,5 @@
-import { auth } from "@/auth";
-import IssueActions from "@/components/IssueActions";
+import Pagination from "@/components/Pagination";
+
 export default async function Home() {
-  const session = await auth();
-  return (
-    <div>
-      <pre>{JSON.stringify(session, null, 2)}</pre>
-      <IssueActions />
-    </div>
-  );
+  return <Pagination currentPage={10} itemCount={100} pageSize={2} />;
 }

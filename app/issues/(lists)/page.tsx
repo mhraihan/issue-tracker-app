@@ -3,6 +3,7 @@ import IssueActions from "@/components/IssueActions";
 import prisma from "@/prisma/prisma";
 import { checkAuthorization } from "@/utils/authUtils";
 import { Issue, Status } from "@prisma/client";
+import { ArrowUpIcon } from "@radix-ui/react-icons";
 import { Table } from "@radix-ui/themes";
 import NextLink from "next/link";
 interface Props {
@@ -53,6 +54,7 @@ const issuePage = async ({ searchParams }: Props) => {
                 >
                   {col.label}
                 </NextLink>
+                {col.value === searchParams.orderBy && <ArrowUpIcon className="inline" />}
               </Table.ColumnHeaderCell>
             ))}
           </Table.Row>

@@ -26,7 +26,7 @@ const IssueActions = () => {
   }, [params]);
 
   return (
-    <Flex mb="5" justify={"between"}>
+    <Flex justify={"between"}>
       {loading ? (
         <Skeleton height={"28px"} width={"141px"} />
       ) : (

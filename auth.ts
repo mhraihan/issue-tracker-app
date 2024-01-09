@@ -6,7 +6,7 @@ import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 export const authConfig = {
   adapter: PrismaAdapter(prisma),
-  providers: [Google],
+  providers: [Github, Google],
   session: {
     strategy: "jwt",
   },

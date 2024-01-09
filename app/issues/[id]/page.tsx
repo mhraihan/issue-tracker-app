@@ -42,4 +42,12 @@ const IssueDetailsPage = async ({ params: { id } }: Props) => {
     notFound();
   }
 };
+
+export async function generateMetadata({params:{id}}: Props){
+  const issue =   await findIssueById(id)
+  return {
+    title: issue?.title,
+    description: `Details of issue ${issue?.id}`
+  }
+}
 export default IssueDetailsPage;

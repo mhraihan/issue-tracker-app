@@ -2,22 +2,23 @@ import { checkAuthorization } from "@/utils/authUtils";
 import { findIssueById } from "@/utils/prismaUtils";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import AssigneeSelect from "./AssigneeSelect ";
 import DeleteIssueButton from "./DeleteIssueButton";
 import EditIssueButton from "./EditIssueButton";
 import IssueDetails from "./IssueDetails";
-import AssigneeSelect from "./AssigneeSelect ";
 interface Props {
   params: {
     id: string;
   };
 }
+const fetchIssue = cache((id: string) => findIssueById(id));
 const IssueDetailsPage = async ({ params: { id } }: Props) => {
   try {
     const [session, issue] = await Promise.all([
       checkAuthorization(),
-      findIssueById(id),
+      fetchIssue(id),
     ]);
-
 
     if (!issue) {
       notFound();
@@ -43,11 +44,11 @@ const IssueDetailsPage = async ({ params: { id } }: Props) => {
   }
 };
 
-export async function generateMetadata({params:{id}}: Props){
-  const issue =   await findIssueById(id)
+export async function generateMetadata({ params: { id } }: Props) {
+  const issue = await fetchIssue(id);
   return {
     title: issue?.title,
-    description: `Details of issue ${issue?.id}`
-  }
+    description: `Details of issue ${issue?.id}`,
+  };
 }
 export default IssueDetailsPage;

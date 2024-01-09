@@ -10,11 +10,14 @@ export const POST = auth(async (request) => {
       { status: 401 }
     );
   }
+
   const body = await request.json();
   const validation = issueSchema.safeParse(body);
+
   if (!validation.success) {
     return NextResponse.json(validation.error.format(), { status: 500 });
   }
+
   const newIssue = await prisma.issue.create({
     data: {
       title: body.title,
@@ -22,5 +25,5 @@ export const POST = auth(async (request) => {
     },
   });
 
-  return NextResponse.json(newIssue, { status: 201 });
+  return NextResponse.json(newIssue, { status: 201 }) as Response;
 });

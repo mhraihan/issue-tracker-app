@@ -1,11 +1,13 @@
-import { auth } from "@/auth";
 import prisma from "@/prisma/prisma";
-import { handleUnauthorized } from "@/utils/authUtils";
-import { NextResponse } from "next/server";
-export const GET = auth(async (request) => {
-  if (!request.auth) {
+import { checkAuthorization, handleUnauthorized } from "@/utils/authUtils";
+import { NextRequest, NextResponse } from "next/server";
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const isLoggedIn = await checkAuthorization();
+
+  if (!isLoggedIn) {
     return handleUnauthorized();
   }
+
   const users = await prisma.user.findMany({
     orderBy: {
       name: "asc",
@@ -13,4 +15,4 @@ export const GET = auth(async (request) => {
   });
 
   return NextResponse.json(users, { status: 200 });
-});
+}
